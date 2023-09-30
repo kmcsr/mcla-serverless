@@ -22,7 +22,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/kmcsr/mcla"
+	"github.com/GlobeMC/mcla"
 	msldb "github.com/kmcsr/mcla-serverless/errdb"
 )
 

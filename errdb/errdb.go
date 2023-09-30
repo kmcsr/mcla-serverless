@@ -8,7 +8,7 @@ import (
 	"io"
 	"io/fs"
 
-	"github.com/kmcsr/mcla"
+	"github.com/GlobeMC/mcla"
 )
 
 const syntaxVersion = 0 // 0 means dev
