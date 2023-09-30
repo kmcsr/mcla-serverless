@@ -102,7 +102,7 @@ func (db *fsErrDB)GetSolution(id int)(sol *mcla.SolutionDesc, err error){
 	return
 }
 
-//go:embed database/*.json
+//go:embed database/*.json database/errors/*.json database/solutions/*.json
 var embedFS embed.FS
 
 var DefaultErrDB = &fsErrDB{

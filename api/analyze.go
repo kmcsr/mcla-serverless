@@ -37,7 +37,17 @@ func writeError(w http.ResponseWriter, status int, err string){
 }
 
 func Handler(w http.ResponseWriter, r *http.Request){
+	switch r.Method {
+	case "GET", "POST":
+	default:
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+	}
 	defer r.Body.Close()
+
+	var (
+		matchRate float32 = 0.5
+	)
+
 	resCh, errCh := analyzeLogErrors(r.Body)
 	ress := make([]*ErrorResult, 0, 8)
 LOOP_RES:
@@ -47,6 +57,9 @@ LOOP_RES:
 			if res == nil { // done
 				break LOOP_RES
 			}
+			res.Matched = filtered(res.Matched, func(m mcla.SolutionPossibility)(bool){
+				return m.Match >= matchRate
+			})
 			ress = append(ress, res)
 		case err := <-errCh:
 			writeError(w, http.StatusInternalServerError,
@@ -64,6 +77,17 @@ LOOP_RES:
 		fmt.Println("Error when encoding to ResponseWriter:", err)
 	}
 }
+
+func filtered[T comparable](arr []T, cb func(T)(bool))(res []T){
+	res = make([]T, 0, len(arr) / 2)
+	for _, v := range arr {
+		if cb(v) {
+			res = append(res, v)
+		}
+	}
+	return
+}
+
 
 type ErrorResult struct {
 	Error   *mcla.JavaError            `json:"error"`
