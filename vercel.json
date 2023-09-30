@@ -1,0 +1,8 @@
+{
+	"rewrites": [
+    {
+      "source": "/:path(v\\d+.*)",
+      "destination": "/api/:path*"
+    }
+  ]
+}
