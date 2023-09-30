@@ -1,0 +1,5 @@
+
+User-agent: *
+Disallow: /api/
+Disallow: /v0/
+Disallow: /v1/
