@@ -24,7 +24,7 @@ paths:
   /v0/analyze:
     post:
       tags:
-        - /v0
+        - v0
       summary: 分析日志并返回匹配的错误
       description: 分析日志并返回匹配的错误
       parameters:
