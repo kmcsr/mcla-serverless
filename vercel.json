@@ -4,5 +4,11 @@
 			"source": "/:path(v\\d+/.*)",
 			"destination": "/api/:path*"
 		}
+	],
+	"redirects": [
+		{
+			"source": "/",
+			"destination": "/docs"
+		}
 	]
 }
