@@ -15,7 +15,7 @@ info:
   version: 1.0.0
 externalDocs:
   description: 前往网页版分析器
-  url: https://bete.crashmc.com/analyzer.html
+  url: https://beta.crashmc.com/analyzer.html
 servers:
   - url: https://api.crashmc.com
   - url: https://mcla-serverless.vercel.app
@@ -36,16 +36,27 @@ paths:
       requestBody:
         description: 待分析的日志
         content:
+          text/plain:
+            schema:
+              type: string
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
           application/x-www-form-urlencoded:
             schema:
               type: string
+              format: binary
           multipart/form-data:
             schema:
+              type: object
               properties:
                 file:
-                  type: array
-                  items:
-                    type: string
+                  type: string
+                  format: binary
+            encoding:
+              file:
+                contentType: text/plain, application/octet-stream
         required: true
       responses:
         '200':
