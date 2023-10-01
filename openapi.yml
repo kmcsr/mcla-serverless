@@ -9,6 +9,7 @@ info:
   contact:
     email: zyxkad@gmail.com
   license:
+    identifier: GPL-3.0-or-later
     name: GPL-3.0
     url: https://www.gnu.org/licenses/gpl-3.0.html
   version: 1.0.0
@@ -27,8 +28,8 @@ paths:
       summary: 分析日志并返回匹配的错误
       description: 分析日志并返回匹配的错误
       parameters:
-        - in: match
-          name: 匹配度
+        - in: query
+          name: match
           description: 错误匹配时, 最小的匹配度
           schema:
             $ref: '#/components/schemas/Possibility'
