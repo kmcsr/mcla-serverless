@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/GlobeMC/mcla"
 	msldb "github.com/kmcsr/mcla-serverless/errdb"
@@ -36,6 +37,8 @@ func writeError(w http.ResponseWriter, status int, err string){
 	})
 }
 
+const multipartMIME = "multipart/form-data"
+
 func Handler(w http.ResponseWriter, r *http.Request){
 	switch r.Method {
 	case "GET", "POST":
@@ -43,10 +46,30 @@ func Handler(w http.ResponseWriter, r *http.Request){
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
 	defer r.Body.Close()
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	var (
-		matchRate float32 = 0.5
+		matchRate float32
 	)
+	{
+		query := r.URL.Query()
+		match, err := strconv.ParseFloat(query.Get("match"), 32)
+		if err != nil {
+			writeError(w, http.StatusBadRequest,
+				fmt.Sprintf("Error when parsing queue \"match\": %v", err))
+			return
+		}
+		matchRate = (float32)(match)
+	}
+
+	if contentType := r.Header.Get("Content-Type"); contentType == multipartMIME {
+		writeError(w, http.StatusUnsupportedMediaType, "multifile doesn't supported yet")
+		return
+	}else if contentType != "application/x-www-form-urlencoded" {
+		writeError(w, http.StatusUnsupportedMediaType, fmt.Sprintf("Unsupport content type %q", contentType))
+		return
+	}
 
 	resCh, errCh := analyzeLogErrors(r.Body)
 	ress := make([]*ErrorResult, 0, 8)
@@ -92,6 +115,7 @@ func filtered[T comparable](arr []T, cb func(T)(bool))(res []T){
 type ErrorResult struct {
 	Error   *mcla.JavaError            `json:"error"`
 	Matched []mcla.SolutionPossibility `json:"matched"`
+	File    string                     `json:"file"`
 }
 
 func analyzeLogErrors(r io.Reader)(<-chan *ErrorResult, <-chan error){

@@ -1,0 +1,162 @@
+
+openapi: 3.1.0
+
+info:
+  title: Minecraft Logs Analyzer API
+  description: |-
+    这是一个[MCLA](https://github.com/GlobeMC/mcla) 的无服务器函数端口
+
+  contact:
+    email: zyxkad@gmail.com
+  license:
+    name: GPL-3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+  version: 1.0.0
+externalDocs:
+  description: 前往网页版分析器
+  url: https://bete.crashmc.com/analyzer.html
+servers:
+  - url: https://api.crashmc.com
+  - url: https://mcla-serverless.vercel.app
+
+paths:
+  /v0/analyze:
+    post:
+      tags:
+        - /v0
+      summary: 分析日志并返回匹配的错误
+      description: 分析日志并返回匹配的错误
+      parameters:
+        - in: match
+          name: 匹配度
+          description: 错误匹配时, 最小的匹配度
+          schema:
+            $ref: '#/components/schemas/Possibility'
+      requestBody:
+        description: 待分析的日志
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: string
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+        required: true
+      responses:
+        '200':
+          description: 分析成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzedResponse'
+        '400':
+          description: 文件提交格式错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '500':
+          description: 处理日志时出错
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+
+components:
+  schemas:
+    AnalyzeResult:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/JavaError'
+        matched:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolutionPossibility'
+        file:
+          type: string
+          description: 错误所在文件的路径
+      description: 分析返回值
+    JavaError:
+      type: object
+      properties:
+        class:
+          type: string
+        message:
+          type: string
+        stacktrace:
+          $ref: '#/components/schemas/Stacktrace'
+        causedBy:
+          $ref: '#/components/schemas/JavaError'
+        lineNo:
+          type: integer
+          minimum: 0
+      description: Java 错误
+    StackInfo:
+      type: object
+      properties:
+        raw:
+          type: string
+        class:
+          type: string
+        method:
+          type: string
+      description: 单行错误栈
+    Stacktrace:
+      type: array
+      items:
+        $ref: '#/components/schemas/StackInfo'
+      description: 错误栈
+    SolutionPossibility:
+      errorDesc:
+        $ref: '#/components/schemas/ErrorDesc'
+      match:
+        $ref: '#/components/schemas/Possibility'
+    Possibility:
+      type: number
+      minimum: 0
+      maximum: 1
+      examples: [0.5, 0, 1]
+      description: 错误匹配度
+    ErrorDesc:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        solutions:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+      description: 错误描述
+
+    AnalyzedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          examples:
+            - ok
+        res:
+          type: array
+          examples:
+            - []
+          items:
+            $ref: '#/components/schemas/AnalyzeResult'
+    ErrorResp:
+      type: object
+      properties:
+        status:
+          type: string
+          examples:
+            - error
+        error:
+          type: string
+          examples:
+            - Error message
