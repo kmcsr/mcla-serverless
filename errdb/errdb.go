@@ -1,5 +1,4 @@
-
-package msldb
+package errdb
 
 import (
 	"embed"
@@ -17,7 +16,7 @@ type UnsupportSyntaxErr struct {
 	Version int
 }
 
-func (e *UnsupportSyntaxErr)Error()(string){
+func (e *UnsupportSyntaxErr) Error() string {
 	return fmt.Sprintf("MCLA-DB syntax version %d is not supported, please update the application", e.Version)
 }
 
@@ -30,13 +29,13 @@ type versionDataT struct {
 }
 
 type fsErrDB struct {
-	FS fs.FS
+	FS            fs.FS
 	cachedVersion versionDataT
 }
 
 var _ mcla.ErrorDB = (*fsErrDB)(nil)
 
-func (db *fsErrDB)getErrorDesc(id int)(desc *mcla.ErrorDesc, err error){
+func (db *fsErrDB) getErrorDesc(id int) (desc *mcla.ErrorDesc, err error) {
 	r, err := db.FS.Open(fmt.Sprintf("database/errors/%d.json", id))
 	if err != nil {
 		return
@@ -48,7 +47,7 @@ func (db *fsErrDB)getErrorDesc(id int)(desc *mcla.ErrorDesc, err error){
 	return
 }
 
-func (db *fsErrDB)checkUpdate()(err error){
+func (db *fsErrDB) checkUpdate() (err error) {
 	if db.cachedVersion == (versionDataT{}) {
 		var fd io.ReadCloser
 		if fd, err = db.FS.Open("database/version.json"); err != nil {
@@ -60,21 +59,21 @@ func (db *fsErrDB)checkUpdate()(err error){
 			return
 		}
 		if v.Major != syntaxVersion {
-			return &UnsupportSyntaxErr{ v.Major }
+			return &UnsupportSyntaxErr{v.Major}
 		}
 		db.cachedVersion = v
 	}
 	return
 }
 
-func (db *fsErrDB)GetVersion()(v versionDataT){
+func (db *fsErrDB) GetVersion() (v versionDataT) {
 	if err := db.checkUpdate(); err != nil {
 		return
 	}
 	return db.cachedVersion
 }
 
-func (db *fsErrDB)ForEachErrors(callback func(*mcla.ErrorDesc)(error))(err error){
+func (db *fsErrDB) ForEachErrors(callback func(*mcla.ErrorDesc) error) (err error) {
 	if err = db.checkUpdate(); err != nil {
 		return
 	}
@@ -90,7 +89,7 @@ func (db *fsErrDB)ForEachErrors(callback func(*mcla.ErrorDesc)(error))(err error
 	return
 }
 
-func (db *fsErrDB)GetSolution(id int)(sol *mcla.SolutionDesc, err error){
+func (db *fsErrDB) GetSolution(id int) (sol *mcla.SolutionDesc, err error) {
 	r, err := db.FS.Open(fmt.Sprintf("database/solutions/%d.json", id))
 	if err != nil {
 		return
