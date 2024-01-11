@@ -2,16 +2,16 @@
 openapi: 3.1.0
 
 info:
-  title: Minecraft Logs Analyzer API
+  title: Minecraft 日志分析器 API | Minecraft Logs Analyzer API
   description: |-
-    这是一个[MCLA](https://github.com/GlobeMC/mcla) 的无服务器函数端口
+    这是一个 [MCLA](https://github.com/GlobeMC/mcla) 的无服务器函数端口
 
   contact:
     email: zyxkad@gmail.com
   license:
-    identifier: GPL-3.0-or-later
-    name: GPL-3.0
-    url: https://www.gnu.org/licenses/gpl-3.0.html
+    identifier: AGPL-3.0
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
   version: 1.0.0
 externalDocs:
   description: 前往网页版分析器
@@ -124,10 +124,12 @@ components:
         $ref: '#/components/schemas/StackInfo'
       description: 错误栈
     SolutionPossibility:
-      errorDesc:
-        $ref: '#/components/schemas/ErrorDesc'
-      match:
-        $ref: '#/components/schemas/Possibility'
+      type: object
+      properties:
+        errorDesc:
+          $ref: '#/components/schemas/ErrorDesc'
+        match:
+          $ref: '#/components/schemas/Possibility'
     Possibility:
       type: number
       minimum: 0
