@@ -92,7 +92,7 @@ components:
         file:
           type: string
           description: 错误所在文件的路径
-      description: 分析返回值
+      description: 分析结果
     JavaError:
       type: object
       properties:
@@ -106,7 +106,7 @@ components:
           $ref: '#/components/schemas/JavaError'
         lineNo:
           type: integer
-          minimum: 0
+          minimum: 1
       description: Java 错误
     StackInfo:
       type: object
