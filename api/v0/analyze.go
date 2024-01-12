@@ -16,6 +16,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,7 +40,7 @@ func writeError(w http.ResponseWriter, status int, err string) {
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case "GET", "POST":
+	case http.MethodGet, http.MethodPost:
 	default:
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
@@ -77,8 +78,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resCh, errCh := analyzeLogErrors(r.Body)
-	ress := make([]*ErrorResult, 0, 8)
+	resCh, errCtx := defaultAnalyzer.DoLogStream(r.Context(), r.Body)
+	ress := make([]*mcla.ErrorResult, 0, 8)
 LOOP_RES:
 	for {
 		select {
@@ -90,7 +91,8 @@ LOOP_RES:
 				return m.Match >= matchRate
 			})
 			ress = append(ress, res)
-		case err := <-errCh:
+		case <-errCtx.Done():
+			err := context.Cause(errCtx)
 			writeError(w, http.StatusInternalServerError,
 				fmt.Sprintf("Error when analyzing: %v", err))
 			return
@@ -100,7 +102,7 @@ LOOP_RES:
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(Map{
 		"status":      "ok",
-		"_db_version": errdb.DefaultErrDB.GetVersion(),
+		"_db_version": (json.RawMessage)(errdb.VersionJson),
 		"res":         ress,
 	}); err != nil {
 		fmt.Println("Error when encoding to ResponseWriter:", err)
@@ -117,14 +119,8 @@ func filtered[T comparable](arr []T, cb func(T) bool) (res []T) {
 	return
 }
 
-type ErrorResult struct {
-	Error   *mcla.JavaError            `json:"error"`
-	Matched []mcla.SolutionPossibility `json:"matched"`
-	File    string                     `json:"file"`
-}
-
-func analyzeLogErrors(r io.Reader) (<-chan *ErrorResult, <-chan error) {
-	resCh := make(chan *ErrorResult, 3)
+func analyzeLogErrors(r io.Reader) (<-chan *mcla.ErrorResult, <-chan error) {
+	resCh := make(chan *mcla.ErrorResult, 3)
 	errCh := make(chan error, 0)
 	go func() {
 		defer close(resCh)
@@ -140,7 +136,7 @@ func analyzeLogErrors(r io.Reader) (<-chan *ErrorResult, <-chan error) {
 					break LOOP
 				}
 				var err error
-				res := &ErrorResult{
+				res := &mcla.ErrorResult{
 					Error: jerr,
 				}
 				if res.Matched, err = defaultAnalyzer.DoError(jerr); err != nil {
