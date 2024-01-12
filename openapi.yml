@@ -90,7 +90,7 @@ components:
             $ref: '#/components/schemas/SolutionPossibility'
         file:
           type: string
-          description: 错误所在文件的路径
+          description: 错误所在文件
       description: 分析结果
     JavaError:
       type: object
@@ -102,7 +102,9 @@ components:
         stacktrace:
           $ref: '#/components/schemas/Stacktrace'
         causedBy:
-          $ref: '#/components/schemas/JavaError'
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/JavaError'
         lineNo:
           type: integer
           minimum: 1
