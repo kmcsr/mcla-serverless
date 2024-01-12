@@ -114,10 +114,13 @@ components:
       properties:
         raw:
           type: string
+          description: 原始错误栈内容
         class:
           type: string
+          description: 错误栈所在的类
         method:
           type: string
+          description: 错误栈所在的函数
       description: 单行错误栈
     Stacktrace:
       type: array
@@ -149,6 +152,7 @@ components:
           items:
             type: integer
             minimum: 0
+            description: 解决放案ID
       description: 错误描述
 
     AnalyzedResponse:
@@ -161,9 +165,26 @@ components:
         res:
           type: array
           examples:
-            - []
+            - 
+              -
+                error:
+                  class: 'net.minecraft.util.ResourceLocationException'
+                  message: 'Non [a-z0-9_.-] character in namespace of location: .DS_Store'
+                  stacktrace:
+                    - raw: '  at package.to.Class.method'
+                      class: 'package.to.Class'
+                      method: 'method'
+                  lineNo: 66
+                matched:
+                  errorDesc:
+                    error: 'net.minecraft.util.ResourceLocationException'
+                    message: 'Non [a-z0-9_.-] character in namespace of location: .DS_Store'
+                    solutions: 1
+                  match: 0.54321
+                file: latest.log
           items:
             $ref: '#/components/schemas/AnalyzeResult'
+      description: 成功响应
     ErrorResp:
       type: object
       properties:
@@ -175,3 +196,4 @@ components:
           type: string
           examples:
             - Error message
+      description: 错误响应
