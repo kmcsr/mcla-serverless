@@ -32,7 +32,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodOptions:
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusOK)
 		return
