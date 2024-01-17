@@ -43,6 +43,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet, http.MethodPost:
 	default:
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
 	}
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
