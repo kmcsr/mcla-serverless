@@ -64,6 +64,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer res.Body.Close()
+	w.Header().Set("Content-Type", res.Header.Get("Content-Type"))
+	w.Header().Set("Content-Length", res.Header.Get("Content-Length"))
 	w.WriteHeader(res.StatusCode)
 	io.Copy(w, res.Body)
 }
