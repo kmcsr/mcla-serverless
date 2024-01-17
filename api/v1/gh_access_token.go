@@ -29,7 +29,7 @@ var CLIENT_ID = os.Getenv("CLIENT_ID")
 var CLIENT_SECRET = os.Getenv("CLIENT_SECRET")
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	switch r.Method {
@@ -56,6 +56,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Accept", w.Header().Get("Accept"))
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
