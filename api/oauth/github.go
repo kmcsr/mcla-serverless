@@ -37,6 +37,9 @@ var CLIENT_SECRET = os.Getenv("CLIENT_SECRET")
 
 var hmacKey = func() (key []byte) {
 	keyStr := os.Getenv("HMAC_KEY")
+	if keyStr == "" {
+		panic("You must set the envionment variable 'HMAC_KEY' as a non-empty base64 value")
+	}
 	key, err := base64.RawStdEncoding.DecodeString(keyStr)
 	if err != nil {
 		panic("Cannot decode hmac key: " + err.Error())
