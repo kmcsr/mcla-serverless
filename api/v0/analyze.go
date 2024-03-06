@@ -49,32 +49,32 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	r.ParseForm()
-
 	var (
 		matchRate float32 = 0.5
 	)
-	{
-		query := r.Form
-		if query.Has("match") {
-			match, err := strconv.ParseFloat(query.Get("match"), 32)
-			if err != nil {
-				writeError(w, http.StatusBadRequest,
-					fmt.Sprintf("Error when parsing queue \"match\": %v", err))
-				return
-			}
-			matchRate = (float32)(match)
+	query := r.URL.Query()
+	if m := query.Get("match"); m != "" {
+		match, err := strconv.ParseFloat(m, 32)
+		if err != nil {
+			writeError(w, http.StatusBadRequest,
+				fmt.Sprintf("Error when parsing query \"match\": %v", err))
+			return
 		}
+		matchRate = (float32)(match)
 	}
 
-	if mediatype, _, err := mime.ParseMediaType(r.Header.Get("Content-Type")); err != nil {
+	mediatype, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
 		writeError(w, http.StatusBadRequest, fmt.Sprintf("Error when parsing Content-Type: %v", err))
-	} else if mediatype == "multipart/form-data" {
-		writeError(w, http.StatusUnsupportedMediaType, "multifile doesn't supported yet")
 		return
-	} else if mediatype == "text/plain" || mediatype == "application/octet-stream" {
-	} else if mediatype == "application/x-www-form-urlencoded" {
-	} else {
+	}
+	switch mediatype {
+	case "text/plain", "application/octet-stream":
+	case "application/x-www-form-urlencoded":
+	case "multipart/form-data":
+		// TODO: support multipart form
+		fallthrough
+	default:
 		writeError(w, http.StatusUnsupportedMediaType, fmt.Sprintf("Unsupport content type %q", mediatype))
 		return
 	}
