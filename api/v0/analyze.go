@@ -50,7 +50,7 @@ func setCORSHeader(w http.ResponseWriter, r *http.Request){
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodGet, http.MethodPost, http.MethodOption:
+	case http.MethodGet, http.MethodPost, http.MethodOptions:
 		setCORSHeader(w, r)
 	default:
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
