@@ -1,5 +1,5 @@
 // Serverless function web API
-// Copyright (C) 2023  zyxkad@gmail.com
+// Copyright (C) 2024  zyxkad@gmail.com
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	u := *r.URL
 	u.Scheme = "https"
 	u.Host = "pastemcapi.crashmc.com"
+	u.Path, _ = strings.CutPrefix(u.Path, "/api")
 	u.Path, _ = strings.CutPrefix(u.Path, "/paste")
 	http.Redirect(w, r, u.String(), http.StatusFound)
 }

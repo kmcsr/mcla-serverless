@@ -1,15 +1,15 @@
 {
 	"trailingSlash": true,
-	"rewrites": [
-		{
-			"source": "/:path(v\\d+/.*)",
-			"destination": "/api/:path*"
-		}
-	],
 	"redirects": [
 		{
 			"source": "/",
 			"destination": "/docs/"
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/:path(v\\d+)",
+			"destination": "/api/:path*"
 		}
 	]
 }
