@@ -38,16 +38,26 @@ func writeError(w http.ResponseWriter, status int, err string) {
 	})
 }
 
+func setCORSHeader(w http.ResponseWriter, r *http.Request){
+	origin := r.Header.Get("Origin")
+	if origin != "" {
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
+		w.Header().Set("Access-Control-Allow-Methods", http.MethodOptions + ", " + http.MethodGet + ", " + http.MethodPost)
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	}
+}
+
 func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodGet, http.MethodPost:
+	case http.MethodGet, http.MethodPost, http.MethodOption:
+		setCORSHeader(w, r)
 	default:
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	var (
 		matchRate float32 = 0.5
