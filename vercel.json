@@ -8,8 +8,12 @@
 	],
 	"rewrites": [
 		{
-			"source": "/:path(v\\d+/.*)",
+			"source": "/:path((?!api/).*)",
 			"destination": "/api/:path*"
+		},
+		{
+			"source": "/paste/:path",
+			"destination": "https://pastemcapi.crashmc.com/:path*"
 		}
 	]
 }
