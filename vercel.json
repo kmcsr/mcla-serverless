@@ -8,7 +8,7 @@
 	],
 	"rewrites": [
 		{
-			"source": "/:path(v\\d+)",
+			"source": "/:path(v\\d+/.*)",
 			"destination": "/api/:path*"
 		}
 	]
