@@ -6,7 +6,7 @@
 			"destination": "/docs/"
 		},
 		{
-			"source": "/paste/:path",
+			"source": "/paste/:path(.*)",
 			"destination": "https://pastemcapi.crashmc.com/:path*"
 		}
 	],
